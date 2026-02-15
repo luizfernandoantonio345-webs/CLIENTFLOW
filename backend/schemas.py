@@ -1,11 +1,12 @@
 from pydantic import BaseModel
+
 class EmpresaLogin(BaseModel):
     email_login: str
     senha: str
     model_config = {
         "from_attributes": True
     }
-from pydantic import BaseModel
+
 
 class EmpresaCreate(BaseModel):
     nome_empresa: str
