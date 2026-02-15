@@ -85,7 +85,9 @@ def criar_cliente(
         "data_primeiro_contato": novo_cliente.data_primeiro_contato
     }
 
-@app.post("/api/empresas/cadastrar", response_model=models.Empresa, status_code=status.HTTP_201_CREATED)
+from backend.schemas import EmpresaOut
+
+@app.post("/api/empresas/cadastrar", response_model=EmpresaOut, status_code=status.HTTP_201_CREATED)
 def cadastrar_empresa(empresa: EmpresaCreate, db: Session = Depends(database.get_db)):
     existing = db.query(models.Empresa).filter(models.Empresa.email_login == empresa.email_login).first()
     if existing:

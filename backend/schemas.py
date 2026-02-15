@@ -1,3 +1,16 @@
+class EmpresaOut(BaseModel):
+    id: int
+    nome_empresa: str
+    nicho: str
+    telefone: str | None = None
+    email_login: str
+    tipo_empresa: str | None = None
+    plano_empresa: str | None = None
+    limite_clientes: int | None = None
+    limite_atendimentos: int | None = None
+    ativo: int | None = None
+    class Config:
+        orm_mode = True
 
 from pydantic import BaseModel
 from datetime import datetime
