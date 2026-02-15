@@ -3,7 +3,7 @@ Camada de serviços para regras de negócio, inteligência e automações do Cli
 """
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
-import models
+from backend import models
 
 def classificar_cliente(cliente: models.Cliente, db: Session):
     """

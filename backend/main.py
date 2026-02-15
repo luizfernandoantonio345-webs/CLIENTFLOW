@@ -8,11 +8,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime
-import models
-import database
-import services
-from models import LogAcao
-import auth
+from backend import models
+from backend import database
+from backend import services
+from backend.models import LogAcao
+from backend import auth
 
 app = FastAPI(title="ClientFlow API", version="1.0.0")
 app.add_middleware(
@@ -142,7 +142,7 @@ def logout_empresa(token: str):
 def ia_resumo_cliente(cliente_id: int):
     try:
         # Função utilitária para buscar atendimentos do cliente
-        from database import SessionLocal
+        from backend.database import SessionLocal
         db = SessionLocal()
         atendimentos = db.query(models.Atendimento).filter(models.Atendimento.cliente_id == cliente_id).all()
         # Converter para lista de dicts
@@ -159,7 +159,7 @@ def ia_resumo_cliente(cliente_id: int):
 @app.get("/ia/sugestoes/{empresa_id}")
 def ia_sugestoes(empresa_id: int):
     try:
-        from database import SessionLocal
+        from backend.database import SessionLocal
         db = SessionLocal()
         clientes = db.query(models.Cliente).filter(models.Cliente.empresa_id == empresa_id).all()
         clientes_list = []
@@ -183,7 +183,7 @@ def ia_sugestoes(empresa_id: int):
 @app.get("/ia/insights/{empresa_id}")
 def ia_insights(empresa_id: int):
     try:
-        from database import SessionLocal
+        from backend.database import SessionLocal
         db = SessionLocal()
         clientes = db.query(models.Cliente).filter(models.Cliente.empresa_id == empresa_id).all()
         atendimentos = db.query(models.Atendimento).filter(models.Atendimento.empresa_id == empresa_id).all()
@@ -207,7 +207,7 @@ class PerguntaIA(BaseModel):
 @app.post("/ia/perguntar")
 def ia_perguntar(body: PerguntaIA):
     try:
-        from database import SessionLocal
+        from backend.database import SessionLocal
         db = SessionLocal()
         # Gerar contexto textual dos clientes e atendimentos da empresa
         clientes = db.query(models.Cliente).filter(models.Cliente.empresa_id == body.empresa_id).all()

@@ -5,7 +5,7 @@ Modelos do banco de dados representando empresas, clientes e atendimentos
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from datetime import datetime
-from database import Base
+from backend.database import Base
 
 # ...existing code...
 
