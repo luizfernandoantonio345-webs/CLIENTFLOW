@@ -3,7 +3,7 @@
 # ===== IMPORTS E DEFINIÇÕES ÚNICOS =====
 from fastapi import FastAPI, Body, Depends, HTTPException, status, Query
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
+from backend.schemas import EmpresaCreate, EmpresaLogin, ClienteCreate, ClienteOut, PerguntaIA
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List, Optional
@@ -11,6 +11,7 @@ from datetime import datetime
 from backend import models
 from backend import database
 from backend import services
+from backend.schemas import EmpresaCreate
 from backend.models import LogAcao
 from backend import auth
 
@@ -39,14 +40,7 @@ def get_current_empresa(token: str, db: Session = Depends(database.get_db)) -> m
 
 from fastapi.encoders import jsonable_encoder
 # ========== ENDPOINTS DE CLIENTES ========== 
-class ClienteOut(BaseModel):
-    id: int
-    nome: str
-    telefone: str
-    anotacoes_rapidas: str = ""
-    data_primeiro_contato: datetime
-    class Config:
-        orm_mode = True
+## ...definição movida para schemas.py...
 
 @app.get("/api/clientes", response_model=List[ClienteOut])
 def listar_clientes(
@@ -58,10 +52,7 @@ def listar_clientes(
     return clientes
 from fastapi import Request
 
-class ClienteCreate(BaseModel):
-    nome: str
-    telefone: str
-    anotacoes_rapidas: str = ""
+## ...definição movida para schemas.py...
 
 @app.post("/api/clientes", status_code=status.HTTP_201_CREATED)
 def criar_cliente(
@@ -95,7 +86,7 @@ def criar_cliente(
     }
 
 @app.post("/api/empresas/cadastrar", response_model=models.Empresa, status_code=status.HTTP_201_CREATED)
-def cadastrar_empresa(empresa: services.EmpresaCreate, db: Session = Depends(database.get_db)):
+def cadastrar_empresa(empresa: EmpresaCreate, db: Session = Depends(database.get_db)):
     existing = db.query(models.Empresa).filter(models.Empresa.email_login == empresa.email_login).first()
     if existing:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email já cadastrado")
@@ -113,7 +104,7 @@ def cadastrar_empresa(empresa: services.EmpresaCreate, db: Session = Depends(dat
     return nova_empresa
 
 @app.post("/api/empresas/login")
-def login_empresa(login: services.EmpresaLogin, db: Session = Depends(database.get_db)):
+def login_empresa(login: EmpresaLogin, db: Session = Depends(database.get_db)):
     empresa = db.query(models.Empresa).filter(models.Empresa.email_login == login.email_login).first()
     if not empresa or not auth.verify_password(login.senha, empresa.senha_hash):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Email ou senha incorretos")
@@ -200,8 +191,7 @@ def ia_insights(empresa_id: int):
         return JSONResponse(status_code=500, content={"erro": str(e)})
 
 # 5. Assistente IA Interno
-class PerguntaIA(BaseModel):
-    pergunta: str
+## ...definição movida para schemas.py...
     empresa_id: int
 
 @app.post("/ia/perguntar")
