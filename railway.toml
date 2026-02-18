@@ -1,0 +1,27 @@
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = "gunicorn main:app -k uvicorn.workers.UvicornWorker --workers 4 --bind 0.0.0.0:8000 --timeout 60 --access-logfile -"
+restartPolicyMaxRetries = 5
+restartPolicyWindowSeconds = 600
+
+[env]
+PYTHONUNBUFFERED = "1"
+PYTHONDONTWRITEBYTECODE = "1"
+ENVIRONMENT = "production"
+LOG_LEVEL = "info"
+
+[[services]]
+name = "ClientFlow-Backend"
+runtime = "dockerfile"
+processType = "web"
+cpuLimit = "500m"
+memoryLimit = "512Mi"
+
+[[databases]]
+name = "PostgreSQL"
+image = "postgres:15"
+version = "15"
+port = 5432
