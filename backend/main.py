@@ -25,11 +25,21 @@ logger = logging.getLogger("clientflow")
 app = FastAPI(title="ClientFlow API", version="1.0.0")
 
 # CORS Configuration with environment variable
-allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:5173").split(",")
+raw_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:5173")
+raw_origins = raw_origins.strip()
+if raw_origins == "*":
+    allowed_origins = ["*"]
+else:
+    allowed_origins = [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
+
+allow_credentials = os.getenv("CORS_ALLOW_CREDENTIALS", "true").lower() == "true"
+if "*" in allowed_origins:
+    allow_credentials = False
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
-    allow_credentials=True,
+    allow_credentials=allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )

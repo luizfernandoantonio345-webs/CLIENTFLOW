@@ -8,12 +8,17 @@ from datetime import datetime, timedelta, timezone
 import os
 import hashlib
 import uuid
+import logging
 # OAuth2 scheme para extrair o token do header Authorization
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/empresas/login")
+logger = logging.getLogger("clientflow.auth")
+environment = os.getenv("ENVIRONMENT", "development").lower()
 SECRET_KEY = os.getenv("JWT_SECRET_KEY") or os.getenv("SECRET_KEY") or ""
 if not SECRET_KEY:
-    # Fallback to a runtime-generated key (not for production)
+    if environment == "production":
+        raise RuntimeError("SECRET_KEY must be set in production")
     SECRET_KEY = os.getenv("SECRET_KEY_RUNTIME", "") or os.urandom(32).hex()
+    logger.warning("SECRET_KEY not set; generated a temporary key for development")
 
 ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "15"))
