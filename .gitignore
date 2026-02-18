@@ -43,6 +43,16 @@ clientflow.db
 # Ambiente
 .env
 .env.local
+.env.*.local
+prod_secrets.json
+
+# Build outputs
+clientflow-frontend/dist/
+clientflow-frontend/node_modules/
+
+# Upload files (local, not in git)
+uploads/*
+!uploads/.gitkeep
 
 # Testes
 .pytest_cache/

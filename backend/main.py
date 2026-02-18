@@ -1,8 +1,11 @@
 ﻿
 import logging
+import os
+from pathlib import Path
 from fastapi import FastAPI, Request, Depends, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from typing import Optional
 from datetime import datetime
@@ -21,14 +24,20 @@ logger = logging.getLogger("clientflow")
 # Instância FastAPI
 app = FastAPI(title="ClientFlow API", version="1.0.0")
 
-# Middleware CORS
+# CORS Configuration with environment variable
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:5173").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Mount static files for logo uploads
+uploads_dir = Path("uploads")
+uploads_dir.mkdir(exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=str(uploads_dir)), name="uploads")
 
 # Criação das tabelas (desabilitado em produção - usar Alembic migrations)
 # Em produção, execute: alembic upgrade head
@@ -56,10 +65,23 @@ async def inject_empresa_id_jwt(request: Request, call_next):
     response = await call_next(request)
     return response
 
-# Health check
+# Health check endpoints
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    """Full health check with database validation"""
+    try:
+        from sqlalchemy import text
+        with database.engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        return {"status": "ok", "version": "1.0.0", "database": "connected"}
+    except Exception as e:
+        logger.error(f"Health check failed: {e}")
+        return JSONResponse(status_code=503, content={"status": "error", "error": str(e)})
+
+@app.get("/api/health")
+def api_health():
+    """Simple health check for load balancers (no DB check)"""
+    return {"status": "ok", "version": "1.0.0"}
 
 # Assistente IA Interno
 @app.post("/ia/perguntar")
