@@ -33,13 +33,22 @@ else:
     )
 
 # Engine PostgreSQL
-# Nota: pool_pre_ping faz health check antes de usar conexões do pool
-# Não falha no import - apenas quando tentar usar a conexão
+# Nota: pool_pre_ping faz health check antes de usar conexões do pool.
+# Não falha no import - apenas quando tentar usar a conexão.
+# connect_timeout curto evita travar o boot em produção (Railway pode dar 502 se demorar pra bindar PORT).
+connect_args = {}
+try:
+    if (SQLALCHEMY_DATABASE_URL or "").startswith("postgresql"):
+        connect_args = {"connect_timeout": int(os.getenv("DB_CONNECT_TIMEOUT", "5"))}
+except Exception:
+    connect_args = {}
+
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
     pool_pre_ping=True,
-    pool_size=10,
-    max_overflow=20,
+    pool_size=int(os.getenv("DB_POOL_SIZE", "5")),
+    max_overflow=int(os.getenv("DB_MAX_OVERFLOW", "10")),
+    connect_args=connect_args,
     echo=False,  # Set to True for SQL query logging
 )
 

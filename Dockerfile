@@ -55,4 +55,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD /bin/sh -c "curl -f http://localhost:${PORT:-8000}/api/health || exit 1"
 
 # Start server
-CMD ["/bin/sh", "-c", "gunicorn backend.main:app -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:${PORT:-8000} --workers 2 --timeout 120 --access-logfile - --error-logfile -"]
+CMD ["/bin/sh", "-c", "gunicorn backend.main:app -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:${PORT:-8000} --workers 1 --timeout 120 --access-logfile - --error-logfile -"]

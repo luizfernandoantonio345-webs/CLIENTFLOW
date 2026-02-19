@@ -180,7 +180,11 @@ def _run_startup_migrations_if_needed() -> None:
     Uses a PostgreSQL advisory lock to avoid multiple workers running migrations concurrently.
     """
 
-    run_flag = os.getenv("RUN_MIGRATIONS_ON_STARTUP", "true").lower().strip()
+    # In production, prefer NOT to run migrations during API startup.
+    # Reason: if the database is slow/unavailable/misconfigured, the app can fail to bind
+    # the PORT in time and Railway returns 502/"request did not respond".
+    default_flag = "false" if environment == "production" else "true"
+    run_flag = os.getenv("RUN_MIGRATIONS_ON_STARTUP", default_flag).lower().strip()
     if run_flag not in {"1", "true", "yes", "on"}:
         return
 
