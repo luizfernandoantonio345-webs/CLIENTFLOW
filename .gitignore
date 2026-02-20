@@ -61,3 +61,4 @@ htmlcov/
 
 # Documentação
 docs/_build/
+.env.railway
