@@ -15,6 +15,11 @@ EMPRESA = {
 
 @pytest.fixture(scope="session")
 def client():
+    try:
+        with httpx.Client(base_url=BASE_URL, timeout=2.0) as c:
+            c.get("/api/health")
+    except Exception:
+        pytest.skip("API local não disponível em http://localhost:8000")
     return httpx.Client(base_url=BASE_URL)
 
 def test_root(client):

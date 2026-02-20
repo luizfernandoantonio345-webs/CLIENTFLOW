@@ -35,6 +35,9 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     Cria um JWT seguro para autenticação
     """
     to_encode = data.copy()
+    # JWT "sub" is expected to be a string by many libraries/validators.
+    if "sub" in to_encode and to_encode["sub"] is not None:
+        to_encode["sub"] = str(to_encode["sub"])
     expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
@@ -50,7 +53,11 @@ def get_current_empresa_jwt(token: str = Depends(oauth2_scheme), db: Session = D
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        empresa_id: int = payload.get("sub")
+        empresa_id_raw = payload.get("sub")
+        try:
+            empresa_id = int(empresa_id_raw) if empresa_id_raw is not None else None
+        except (TypeError, ValueError):
+            empresa_id = None
         if empresa_id is None:
             raise credentials_exception
     except JWTError:
@@ -65,6 +72,10 @@ def decode_access_token(token: str):
     """
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        # Keep backward compatibility in tests/app code that expects int empresa_id.
+        sub = payload.get("sub")
+        if isinstance(sub, str) and sub.isdigit():
+            payload["sub"] = int(sub)
         return payload
     except JWTError:
         return None
@@ -160,8 +171,14 @@ def verify_refresh_token(db: Session, token: str) -> Optional[models.RefreshToke
     rt = db.query(models.RefreshToken).filter(models.RefreshToken.jti == jti).first()
     if not rt or rt.revoked:
         return None
-    if rt.expires_at and rt.expires_at < datetime.now(timezone.utc):
-        return None
+    if rt.expires_at:
+        now = datetime.now(timezone.utc)
+        expires_at = rt.expires_at
+        # SQLite tests may return naive datetimes; normalize before comparison.
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+        if expires_at < now:
+            return None
     if _hash_token(raw) != rt.token_hash:
         return None
     return rt
