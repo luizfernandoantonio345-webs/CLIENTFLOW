@@ -1,4 +1,4 @@
-# Railway sync marker: 2026-02-20
+# Railway sync marker: 2026-02-23-deploy-88b7739
 FROM node:18-alpine AS frontend-build
 
 WORKDIR /build
