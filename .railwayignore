@@ -1,0 +1,12 @@
+# Railway ignore file - forces rebuild
+# Updated: 2026-02-23 commit 73e8c88
+# Triggers redeployment check
+.git
+.gitignore
+*.md
+node_modules/
+__pycache__/
+.pytest_cache/
+.venv/
+venv/
+*.pyc
