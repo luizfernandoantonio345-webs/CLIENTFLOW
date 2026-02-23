@@ -16,6 +16,7 @@ def get_tenant_db(request: Request, db: Session = Depends(get_db)):
     schema = None
     if hasattr(request.state, "empresa_id") and request.state.empresa_id:
         schema = f"empresa_{request.state.empresa_id}"
-    if schema:
+    dialect = db.bind.dialect.name if db.bind is not None else ""
+    if schema and dialect == "postgresql":
         db.execute(text(f"SET search_path TO {schema}, public"))
     yield db

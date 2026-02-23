@@ -1,4 +1,9 @@
-# 🚀 CLIENTFLOW - STATUS FINAL DEPLOYMENT
+https://railway.app/dashboard → ClientFlow → Settings → Variables
+
+Key:   CORS_ORIGINS
+Value: ["https://clientflow-dev-one.vercel.app"]
+
+Depois: Restart (Deployments → clique no deploy → Restart)# 🚀 CLIENTFLOW - STATUS FINAL DEPLOYMENT
 
 **Data:** 19 de Fevereiro de 2026  
 **Status:** ✅ **PRONTO PARA PRODUÇÃO**
