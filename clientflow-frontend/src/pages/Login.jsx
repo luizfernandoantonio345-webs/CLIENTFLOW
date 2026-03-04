@@ -1,5 +1,5 @@
 import { useState, useContext } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import AuthContext from '../context/AuthContext'
 
@@ -55,9 +55,7 @@ function Login() {
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
             <input
               type="email"
               value={email}
@@ -69,15 +67,13 @@ function Login() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Senha
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Senha</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="•••••••"
+              placeholder="*******"
               required
             />
           </div>
@@ -91,8 +87,12 @@ function Login() {
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-600 mt-6">
-          Versão 1.0.0
+        <p className="text-center text-sm text-gray-600 mt-6">Versao 1.0.0</p>
+        <p className="text-center text-sm text-gray-600 mt-2">
+          Nao tem conta?{' '}
+          <Link to="/cadastro" className="text-primary hover:underline">
+            Criar conta
+          </Link>
         </p>
       </div>
     </div>
@@ -100,3 +100,4 @@ function Login() {
 }
 
 export default Login
+

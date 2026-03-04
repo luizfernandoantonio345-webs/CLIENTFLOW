@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-route
 import { useState, useEffect, useCallback } from 'react'
 import axios from 'axios'
 import Login from './pages/Login'
+import Cadastro from './pages/Cadastro'
 import Dashboard from './pages/Dashboard'
 import Planos from './pages/Planos'
 import PrivateRoute from './routes/PrivateRoute'
@@ -95,6 +96,7 @@ function App() {
         <PlanLimitModal open={planLimitOpen} onClose={closePlanLimitModal} />
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/cadastro" element={<Cadastro />} />
           <Route
             path="/dashboard"
             element={
